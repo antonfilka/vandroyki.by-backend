@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Destination {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  images      String[]
+  location    String
+  favoritedBy User[]   @relation("UserFavorites")
+  creatorId   Int?
+  creator     User?    @relation("CreatedBy", fields: [creatorId], references: [id])
+}
+
+model User {
+  id                   Int           @id @default(autoincrement())
+  email                String?       @unique
+  username             String?       @unique
+  firstName            String?
+  lastName             String?
+  picture              String?
+  accessToken          String?
+  password             String?
+  role                 UserRole      @default(USER)
+  favoriteDestinations Destination[] @relation("UserFavorites")
+  createdDestinations  Destination[] @relation("CreatedBy")
+}
+
+enum UserRole {
+  USER
+  MANAGER
+}
