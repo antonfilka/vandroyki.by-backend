@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { UsersRepository } from 'src/endpoints/users/users.repository';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { SharedModule } from 'src/modules/shared/shared.module';
 
 @Module({
+  imports: [SharedModule],
   controllers: [UsersController],
-  providers: [UsersService, UsersRepository, PrismaService, JwtService],
+  providers: [UsersService, JwtService],
 })
 export class UsersModule {}

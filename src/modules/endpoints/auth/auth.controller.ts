@@ -9,19 +9,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { UsersService } from 'src/endpoints/users/users.service';
-import { RefreshJwtGuard } from 'src/guards/refresh.guard';
+import { RefreshJwtGuard } from 'src/modules/shared/auth/refresh.guard';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
-import { LoginDto } from './dto/auth.dto';
+import { GoogleLoginDto, LoginDto } from './dto/auth.dto';
 import { CreateUserCredentialsDto } from '../users/dto/user.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private userService: UsersService,
-    private authService: AuthService,
-  ) {}
+  constructor(private authService: AuthService) {}
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
@@ -30,20 +26,25 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req, @Res() res: Response) {
-    const tokens = await this.userService.authGoogleUser(req.user);
+    const tokens = await this.authService.authGoogleUser(req.user);
     res.redirect(
-      `${process.env.FRONTEND_URL}/google-auth?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`,
+      `${process.env.FRONTEND_URL}/google-auth?accessToken=${tokens.backendTokens.accessToken}&refreshToken=${tokens.backendTokens.refreshToken}`,
     );
   }
 
   @Post('register')
   async registerUser(@Body() dto: CreateUserCredentialsDto) {
-    return await this.userService.create(dto);
+    return await this.authService.register(dto);
   }
 
   @Post('login')
   async login(@Body() dto: LoginDto) {
     return await this.authService.login(dto);
+  }
+
+  @Post('google-login')
+  async googleLogin(@Body() dto: GoogleLoginDto) {
+    return await this.authService.googleLogin(dto);
   }
 
   @UseGuards(RefreshJwtGuard)

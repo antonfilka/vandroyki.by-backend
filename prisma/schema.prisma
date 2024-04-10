@@ -14,7 +14,7 @@ model Destination {
   images      String[]
   location    String
   favoritedBy User[]   @relation("UserFavorites")
-  creatorId   Int?
+  creatorId   Int
   creator     User?    @relation("CreatedBy", fields: [creatorId], references: [id])
 }
 
