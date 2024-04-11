@@ -3,6 +3,7 @@ import { CreateUserCredentialsDto } from './dto/user.dto';
 import { hash } from 'bcrypt';
 import { PROVIDERS } from 'src/constants/providers';
 import { PrismaInstance } from 'src/modules/shared/database/prisma.providers';
+import { AssignRoleDto } from './dto/assign-role.dto';
 
 @Injectable()
 export class UsersService {
@@ -35,7 +36,7 @@ export class UsersService {
     return result;
   }
 
-  async getById(id: number) {
+  async getById(id: string) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...user } = await this.prisma.user.findUnique({
       where: {
@@ -44,5 +45,16 @@ export class UsersService {
     });
 
     return user;
+  }
+
+  async getAll() {
+    return await this.prisma.user.findMany();
+  }
+
+  async assignRole(body: AssignRoleDto) {
+    await this.prisma.user.update({
+      where: { id: body.userId },
+      data: { role: body.newRole },
+    });
   }
 }

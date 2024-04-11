@@ -30,7 +30,7 @@ export class UserRepository {
     });
   }
 
-  async getById(id: number) {
+  async getById(id: string) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...user } = await this.prisma.user.findUnique({
       where: {

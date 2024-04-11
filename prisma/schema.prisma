@@ -7,32 +7,172 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Destination {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  images      String[]
-  location    String
-  favoritedBy User[]   @relation("UserFavorites")
-  creatorId   Int
-  creator     User?    @relation("CreatedBy", fields: [creatorId], references: [id])
-}
-
 model User {
-  id                   Int           @id @default(autoincrement())
+  id                   String        @id @default(uuid())
   email                String?       @unique
   username             String?       @unique
   firstName            String?
   lastName             String?
   picture              String?
+  location             String?
+  restPictures         String[]
   accessToken          String?
   password             String?
   role                 UserRole      @default(USER)
-  favoriteDestinations Destination[] @relation("UserFavorites")
-  createdDestinations  Destination[] @relation("CreatedBy")
+  bio                  String?
+  language             LanguageCode  @default(BELARUSSIAN)
+  city                 City?          @relation("UserCities", fields: [cityId], references: [id])
+  cityId               String
+  matchedUsers         User[]        @relation("MatchedUsers")
+  matchedBy            User[]        @relation("MatchedUsers")
+  interests            Interest[]    @relation("UserInterests")
+  visitedDestinations  Destination[] @relation("UserVisited")
+  favoriteDestinations Destination[] @relation("UserFavoritesDestinations")
+  favoriteEvents       Event[]       @relation("UserFavoritesEvents")
+  createdDestinations  Destination[] @relation("DestinationCreatedBy")
+  createdTrips         Trip[]        @relation("TripCreatedBy")
+  createdEvents        Event[]       @relation("EventCreatedBy")
+  initiatedRequests    Request[]     @relation("RequestInitiatedBy")
+  targettedInRequests  Request[]     @relation("RequestTarget")
+  tripsMember          Trip[]        @relation("TripMembers")
+  comments             Comment[]     @relation("CommentedBy")
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+}
+
+model Destination {
+  id              String            @id @default(uuid())
+  title           String
+  description     String
+  images          String[]
+  location        String
+  status          DestinationStatus
+  favoritedBy     User[]            @relation("UserFavoritesDestinations")
+  visitedBy       User[]            @relation("UserVisited")
+  comments        Comment[]         @relation("DestinationComment")
+  tripDestination Trip[]            @relation("TripDestinations")
+  creatorId       String
+  creator         User?             @relation("DestinationCreatedBy", fields: [creatorId], references: [id])
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model Trip {
+  id            String        @id @default(uuid())
+  title         String
+  notes         String
+  creatorId     String
+  plannedStart  DateTime
+  images        String[]
+  allowComments Boolean       @default(false)
+  status        TripStatus    @default(PRIVATE)
+  creator       User          @relation("TripCreatedBy", fields: [creatorId], references: [id])
+  destinations  Destination[] @relation("TripDestinations")
+  members       User[]        @relation("TripMembers")
+  comments      Comment[]     @relation("TripComment")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Event {
+  id            String      @id @default(uuid())
+  title         String
+  description   String
+  location      String
+  plannedStart  DateTime
+  images        String[]
+  creatorId     String
+  allowComments Boolean     @default(true)
+  status        EventStatus @default(PUBLIC)
+  comments      Comment[]   @relation("EventComment")
+  favoritedBy   User[]      @relation("UserFavoritesEvents")
+  creator       User        @relation("EventCreatedBy", fields: [creatorId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Comment {
+  id            String       @id @default(uuid())
+  text          String
+  images        String[]
+  userId        String
+  destinationId String?
+  tripId        String?
+  eventId       String?
+  user          User         @relation("CommentedBy", fields: [userId], references: [id])
+  Destination   Destination? @relation("DestinationComment", fields: [destinationId], references: [id])
+  Trip          Trip?        @relation("TripComment", fields: [tripId], references: [id])
+  Event         Event?       @relation("EventComment", fields: [eventId], references: [id])
+  createdAt     DateTime     @default(now())
+}
+
+model Request {
+  id          String        @id @default(uuid())
+  type        RequestType
+  status      RequestStatus
+  initiatorId String
+  targetId    String
+  initiator   User          @relation("RequestInitiatedBy", fields: [initiatorId], references: [id])
+  target      User          @relation("RequestTarget", fields: [targetId], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model City {
+  id    String @id @default(uuid())
+  name  String
+  users User[] @relation("UserCities")
+}
+
+model Interest {
+  id    String @id @default(uuid())
+  name  String
+  users User[] @relation("UserInterests")
 }
 
 enum UserRole {
   USER
   MANAGER
+  ADMIN
+}
+
+enum DestinationStatus {
+  PUBLISHED
+  SUGGESTED
+  ARCHIVED
+}
+
+enum TripStatus {
+  PRIVATE
+  PUBLIC
+}
+
+enum EventStatus {
+  PRIVATE
+  PUBLIC
+}
+
+enum RequestType {
+  // when user wants to join to foreign trip
+  JOIN_TRIP
+  // when user wants to join to foreign event
+  JOIN_EVENT
+  // when user invited to join trip
+  INVITE_JOIN_TRIP
+  // when user invited to join event
+  INVITE_JOIN_EVENT
+  // when user likes another user to detect a match between them
+  LIKE
+}
+
+enum RequestStatus {
+  ACTIVE
+  CONFIRMED
+  REJECTED
+}
+
+enum LanguageCode {
+  BELARUSSIAN
+  ENGLISH
+  RUSSIAN
 }
