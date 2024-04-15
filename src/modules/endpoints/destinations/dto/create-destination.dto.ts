@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateDestinationDto {
   @IsNotEmpty()
@@ -16,4 +16,8 @@ export class CreateDestinationDto {
   @IsNotEmpty()
   @IsString()
   location: string;
+
+  @IsOptional()
+  @IsString()
+  cityId?: string;
 }

@@ -1,8 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PROVIDERS } from '../../../../constants/providers';
 import { PrismaInstance } from '../prisma.providers';
-import { CreateUserGoogleDto } from 'src/modules/endpoints/users/dto/user.dto';
 import { User } from '@prisma/client';
+import { TelegramLoginDto } from 'src/modules/endpoints/auth/dto/auth.dto';
+import { CreateUserGoogleDto } from 'src/modules/endpoints/users/dto/user.dto';
 
 @Injectable()
 export class UserRepository {
@@ -22,22 +23,29 @@ export class UserRepository {
     });
   }
 
+  async upsertTelegramUser(userData: TelegramLoginDto): Promise<User> {
+    return await this.prisma.user.upsert({
+      where: {
+        id: userData.id,
+      },
+      update: {
+        ...userData,
+      },
+      create: {
+        ...userData,
+      },
+    });
+  }
+
   async getByEmailOrUsername(emailUsername: string) {
     return await this.prisma.user.findFirst({
       where: {
-        OR: [{ email: emailUsername }, { username: emailUsername }],
+        OR: [{ username: emailUsername }],
       },
     });
   }
 
   async getById(id: string) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...user } = await this.prisma.user.findUnique({
-      where: {
-        id,
-      },
-    });
-
-    return user;
+    return await this.prisma.user.findUnique({ where: { id } });
   }
 }

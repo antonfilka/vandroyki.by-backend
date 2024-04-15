@@ -7,5 +7,10 @@ declare namespace NodeJS {
     FRONTEND_URL: string;
     JWT_SECRET_KEY: string;
     JWT_REFRESH_TOKEN_KEY: string;
+
+    YANDEX_KEY_ID: string;
+    YANDEX_SECRET_KEY: string;
+    YANDEX_BUCKET: string;
+    YANDEX_REGION: string;
   }
 }

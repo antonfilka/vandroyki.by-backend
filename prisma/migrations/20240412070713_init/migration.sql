@@ -22,13 +22,14 @@ CREATE TYPE "LanguageCode" AS ENUM ('BELARUSSIAN', 'ENGLISH', 'RUSSIAN');
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
-    "email" TEXT,
     "username" TEXT,
     "firstName" TEXT,
     "lastName" TEXT,
     "picture" TEXT,
     "location" TEXT,
     "restPictures" TEXT[],
+    "authDate" TEXT,
+    "hash" TEXT,
     "accessToken" TEXT,
     "password" TEXT,
     "role" "UserRole" NOT NULL DEFAULT 'USER',
@@ -49,6 +50,7 @@ CREATE TABLE "Destination" (
     "images" TEXT[],
     "location" TEXT NOT NULL,
     "status" "DestinationStatus" NOT NULL,
+    "cityId" TEXT NOT NULL,
     "creatorId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -175,10 +177,16 @@ CREATE TABLE "_UserInterests" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "City_name_key" ON "City"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Interest_name_key" ON "Interest"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_MatchedUsers_AB_unique" ON "_MatchedUsers"("A", "B");
@@ -224,6 +232,9 @@ CREATE INDEX "_UserInterests_B_index" ON "_UserInterests"("B");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_cityId_fkey" FOREIGN KEY ("cityId") REFERENCES "City"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Destination" ADD CONSTRAINT "Destination_cityId_fkey" FOREIGN KEY ("cityId") REFERENCES "City"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Destination" ADD CONSTRAINT "Destination_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

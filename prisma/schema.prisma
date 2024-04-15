@@ -9,20 +9,22 @@ datasource db {
 
 model User {
   id                   String        @id @default(uuid())
-  email                String?       @unique
   username             String?       @unique
+  email                String?       @unique
   firstName            String?
   lastName             String?
   picture              String?
   location             String?
   restPictures         String[]
+  authDate             String?
+  hash                 String?
   accessToken          String?
   password             String?
   role                 UserRole      @default(USER)
   bio                  String?
   language             LanguageCode  @default(BELARUSSIAN)
-  city                 City?          @relation("UserCities", fields: [cityId], references: [id])
-  cityId               String
+  city                 City?         @relation("UserCities", fields: [cityId], references: [id])
+  cityId               String?
   matchedUsers         User[]        @relation("MatchedUsers")
   matchedBy            User[]        @relation("MatchedUsers")
   interests            Interest[]    @relation("UserInterests")
@@ -47,12 +49,14 @@ model Destination {
   images          String[]
   location        String
   status          DestinationStatus
+  city            City?             @relation("DestinationCities", fields: [cityId], references: [id])
+  cityId          String
   favoritedBy     User[]            @relation("UserFavoritesDestinations")
   visitedBy       User[]            @relation("UserVisited")
   comments        Comment[]         @relation("DestinationComment")
   tripDestination Trip[]            @relation("TripDestinations")
   creatorId       String
-  creator         User?             @relation("DestinationCreatedBy", fields: [creatorId], references: [id])
+  creator         User              @relation("DestinationCreatedBy", fields: [creatorId], references: [id])
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 }
@@ -119,14 +123,15 @@ model Request {
 }
 
 model City {
-  id    String @id @default(uuid())
-  name  String
-  users User[] @relation("UserCities")
+  id           String        @id @default(uuid())
+  name         String        @unique
+  users        User[]        @relation("UserCities")
+  destinations Destination[] @relation("DestinationCities")
 }
 
 model Interest {
   id    String @id @default(uuid())
-  name  String
+  name  String @unique
   users User[] @relation("UserInterests")
 }
 

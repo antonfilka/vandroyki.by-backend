@@ -15,4 +15,11 @@ export default () => ({
 
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+
+  YANDEX_KEY_ID: process.env.YANDEX_KEY_ID,
+  YANDEX_SECRET_KEY: process.env.YANDEX_SECRET_KEY,
+  YANDEX_BUCKET: process.env.YANDEX_BUCKET,
+  YANDEX_REGION: process.env.YANDEX_REGION,
+
+  BACKEND_SECRET_KEY: process.env.BACKEND_SECRET_KEY,
 });

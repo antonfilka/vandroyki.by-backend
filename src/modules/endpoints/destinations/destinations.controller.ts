@@ -21,9 +21,9 @@ export class DestinationsController {
   constructor(private destinationsService: DestinationsService) {}
 
   @Get()
-  async getPublishedDestinations() {
+  async getPublishedDestinations(@Query() query: GetDestinationsDto) {
     const destinations =
-      await this.destinationsService.getPublishedDestinations();
+      await this.destinationsService.getPublishedDestinations(query);
 
     return { data: destinations };
   }

@@ -7,6 +7,7 @@ import { EditableConstantsModule } from './editableConstants/editableConstants.m
 import { EventsModule } from './events/events.module';
 import { RequestsModule } from './requests/requests.module';
 import { TripsModule } from './trips/trips.module';
+import { S3Module } from './s3/s3.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { TripsModule } from './trips/trips.module';
     EventsModule,
     RequestsModule,
     TripsModule,
+    S3Module,
   ],
 })
 export class EndpointsModule {}
